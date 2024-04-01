@@ -1,18 +1,20 @@
 import React from 'react';
-import { withRouter } from 'react-router';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate hook
 
 import { ButtonFooter, CardContent } from '../components';
 
 function ProductList({
   handleDeleteProduct,
   handleSelectProduct,
-  products,
-  history,
+  products = [],
 }) {
+  console.log(products);
+  const navigate = useNavigate(); // Use useNavigate hook for navigation
+
   function selectProduct(e) {
     const product = getSelectedProduct(e);
     handleSelectProduct(product);
-    history.push(`/products/${product.id}`);
+    navigate(`/products/${product.id}`); // Replace history.push with navigate
   }
 
   function deleteProduct(e) {
@@ -27,9 +29,9 @@ function ProductList({
 
   return (
     <div>
-      {products.length === 0 && <div>Loading data ...</div>}
+      {products && products.length === 0 && <div>Loading data ...</div>}
       <ul className="list">
-        {products.map((product, index) => (
+        {products && products.map((product, index) => (
           <li key={product.id} role="presentation">
             <div className="card">
               <CardContent
@@ -40,7 +42,7 @@ function ProductList({
                 <ButtonFooter
                   className="delete-item"
                   iconClasses="fas fa-trash"
-                  onClick={deleteProduct}
+                  onClick={(e) => deleteProduct(e)}
                   label="Delete"
                   dataIndex={index}
                   dataId={product.id}
@@ -48,7 +50,7 @@ function ProductList({
                 <ButtonFooter
                   className="edit-item"
                   iconClasses="fas fa-edit"
-                  onClick={selectProduct}
+                  onClick={(e) => selectProduct(e)}
                   label="Edit"
                   dataIndex={index}
                   dataId={product.id}
@@ -62,4 +64,4 @@ function ProductList({
   );
 }
 
-export default withRouter(ProductList);
+export default ProductList;
