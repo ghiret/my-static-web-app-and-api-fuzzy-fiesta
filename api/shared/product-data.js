@@ -18,6 +18,48 @@ const data = {
       description: 'Bag of 7 fresh McIntosh apples',
       quantity: 1,
     },
+    {
+      id: 40,
+      name: 'Milk',
+      description: '1 gallon of organic whole milk',
+      quantity: 1,
+    },
+    {
+      id: 50,
+      name: 'Eggs',
+      description: 'Carton of 12 organic eggs',
+      quantity: 1,
+    },
+    {
+      id: 60,
+      name: 'Cheese',
+      description: '8oz package of cheddar cheese',
+      quantity: 1,
+    },
+    {
+      id: 70,
+      name: 'Butter',
+      description: '1lb package of unsalted butter',
+      quantity: 1,
+    },
+    {
+      id: 80,
+      name: 'Yogurt',
+      description: '32oz container of plain yogurt',
+      quantity: 1,
+    },
+    {
+      id: 90,
+      name: 'Orange Juice',
+      description: '64oz bottle of orange juice',
+      quantity: 1,
+    },
+    {
+      id: 100,
+      name: 'Coffee',
+      description: '1lb bag of ground coffee',
+      quantity: 1,
+    }
   ],
 };
 

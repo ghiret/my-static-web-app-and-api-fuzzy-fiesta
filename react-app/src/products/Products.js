@@ -1,66 +1,126 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate hook
+import React, { useEffect, useState } from 'react';
+import { Route, Switch } from 'react-router-dom';
 
-import { ButtonFooter, CardContent } from '../components';
+import { ListHeader, ModalYesNo } from '../components';
+import ProductDetail from './ProductDetail';
+import ProductList from './ProductList';
+import useProducts from './useProducts';
 
-function ProductList({
-  handleDeleteProduct,
-  handleSelectProduct,
-  products = [],
-}) {
-  const navigate = useNavigate(); // Use useNavigate hook for navigation
+const captains = console;
 
-  function selectProduct(e) {
-    const product = getSelectedProduct(e);
-    handleSelectProduct(product);
-    navigate(`/products/${product.id}`); // Replace history.push with navigate
+function Products({ history }) {
+  const [productToDelete, setProductToDelete] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const {
+    addProduct,
+    deleteProduct,
+    getProducts,
+    products,
+    selectProduct,
+    selectedProduct,
+    updateProduct,
+  } = useProducts();
+
+  useEffect(() => {
+    getProducts();
+  }, [getProducts]);
+
+  function addNewProduct() {
+    selectProduct({});
+    history.push('/products/0');
   }
 
-  function deleteProduct(e) {
-    const product = getSelectedProduct(e);
-    handleDeleteProduct(product);
+  function handleCancelProduct() {
+    history.push('/products');
+    selectProduct(null);
+    setProductToDelete(null);
   }
 
-  function getSelectedProduct(e) {
-    const index = +e.currentTarget.dataset.index;
-    return products[index];
+  function handleDeleteProduct(product) {
+    selectProduct(null);
+    setProductToDelete(product);
+    setShowModal(true);
+  }
+
+  function handleSaveProduct(product) {
+    if (selectedProduct && selectedProduct.name) {
+      captains.log(product);
+      updateProduct(product);
+    } else {
+      addProduct(product);
+    }
+    handleCancelProduct();
+  }
+
+  function handleCloseModal() {
+    setShowModal(false);
+  }
+
+  function handleDeleteFromModal() {
+    setShowModal(false);
+    deleteProduct(productToDelete);
+    handleCancelProduct();
+  }
+
+  function handleSelectProduct(selectedProduct) {
+    selectProduct(selectedProduct);
+    captains.log(`you selected ${selectedProduct.name}`);
+  }
+
+  function handleRefresh() {
+    handleCancelProduct();
+    getProducts();
   }
 
   return (
-    <div>
-      {products && products.length === 0 && <div>Loading data ...</div>}
-      <ul className="list">
-        {products && products.map((product, index) => (
-          <li key={product.id} role="presentation">
-            <div className="card">
-              <CardContent
-                name={product.name}
-                description={product.description}
-              />
-              <footer className="card-footer">
-                <ButtonFooter
-                  className="delete-item"
-                  iconClasses="fas fa-trash"
-                  onClick={deleteProduct}
-                  label="Delete"
-                  dataIndex={index}
-                  dataId={product.id}
+    <div className="content-container">
+      <ListHeader
+        title="Products"
+        handleAdd={addNewProduct}
+        handleRefresh={handleRefresh}
+        routePath="/products"
+      />
+      <div className="columns is-multiline is-variable">
+        <div className="column is-8">
+          <Switch>
+            <Route
+              exact
+              path="/products"
+              component={() => (
+                <ProductList
+                  products={products}
+                  selectedProduct={selectedProduct}
+                  handleSelectProduct={handleSelectProduct}
+                  handleDeleteProduct={handleDeleteProduct}
                 />
-                <ButtonFooter
-                  className="edit-item"
-                  iconClasses="fas fa-edit"
-                  onClick={selectProduct}
-                  label="Edit"
-                  dataIndex={index}
-                  dataId={product.id}
-                />
-              </footer>
-            </div>
-          </li>
-        ))}
-      </ul>
+              )}
+            />
+            <Route
+              exact
+              path="/products/:id"
+              component={() => {
+                return (
+                  <ProductDetail
+                    product={selectedProduct}
+                    handleCancelProduct={handleCancelProduct}
+                    handleSaveProduct={handleSaveProduct}
+                  />
+                );
+              }}
+            />
+          </Switch>
+        </div>
+      </div>
+
+      {showModal && (
+        <ModalYesNo
+          message={`Would you like to delete ${productToDelete.name}?`}
+          onNo={handleCloseModal}
+          onYes={handleDeleteFromModal}
+        />
+      )}
     </div>
   );
 }
 
-export default ProductList;
+export default Products;
